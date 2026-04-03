@@ -1,0 +1,27 @@
+# ── Ingestion Settings ─────────────────────────────────────
+ingestion:
+  chunk_size: 800        
+  chunk_overlap: 100     
+  data_dir: "./data/papers"
+
+# ── Retrieval Settings ─────────────────────────────────────
+retrieval:
+  top_k: 5
+  reranker_model: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+
+# ── Embedding Settings ─────────────────────────────────────
+embeddings:
+  model: "BAAI/bge-small-en-v1.5"
+
+# ── Generation Settings ────────────────────────────────────
+
+
+generation:
+  model: "llama-3.1-8b-instant"
+  max_new_tokens: 512
+  temperature: 0.2
+  provider: "groq"
+
+
+logging:
+  level: "INFO"
