@@ -1,5 +1,5 @@
 # DocMind — Production-Grade RAG Pipeline with Observability
-[🚀 Live Demo ](http://docmind-rag.duckdns.org/)
+🚀[Live Demo ](http://docmind-rag.duckdns.org/)
 ## 🚀 Overview
 
 DocMind is a production-style Retrieval Augmented Generation (RAG) system that allows users to upload documents and ask questions over them using an LLM-powered pipeline. It goes beyond a basic RAG implementation by adding reranking, observability, and deployment readiness.
