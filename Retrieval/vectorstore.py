@@ -1,4 +1,7 @@
 from __future__ import annotations
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 import os
 import time
 import yaml
@@ -41,7 +44,6 @@ def create_vectorstore(
 
     logger.info(f"Creating ChromaDB vector store with {len(chunks)} chunks...")
     start_time = time.time()
-
     vectorstore = Chroma.from_documents(
         documents=chunks,
         embedding=embeddings,
