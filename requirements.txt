@@ -13,18 +13,9 @@ sentence-transformers==2.7.0
 rank-bm25==0.2.2
 langfuse==2.36.1
 groq
-langchain-groq
-unstructured
-python-docx
+unstructured[md]
 docx2txt
-wikipedia
-beautifulsoup4
-jq
-nest_asyncio
-ragas==0.1.21
-datasets
-posthog==2.4.2
 tokenizers==0.19.1
 transformers==4.43.3
-
-
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.3.1

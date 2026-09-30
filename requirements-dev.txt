@@ -1,0 +1,10 @@
+# Evaluation, offline data ingestion, and non-runtime packages
+langchain-groq
+python-docx
+wikipedia
+beautifulsoup4
+jq
+nest_asyncio
+ragas==0.1.21
+datasets
+posthog==2.4.2
