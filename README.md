@@ -1,188 +1,96 @@
 # DocMind — Production-Grade RAG Pipeline with Observability
-⚡[Live Demo](http://docmind-rag.duckdns.org/)
+
+⚡ [Live Demo](https://docmind-rag-pipeline.streamlit.app/)
+
 ## 🚀 Overview
-
-DocMind is a production-style Retrieval Augmented Generation (RAG) system that allows users to upload documents and ask questions over them using an LLM-powered pipeline. It goes beyond a basic RAG implementation by adding reranking, observability, and deployment readiness.
-
----
+DocMind is a production-style Retrieval Augmented Generation (RAG) system that allows users to upload documents and ask questions over them using an LLM-powered pipeline. It goes beyond a basic RAG implementation by adding hybrid retrieval, reranking, and full observability.
 
 ## ✨ Key Features
-
-* 📄 Multi-format document support (PDF, DOCX, TXT, CSV, MD)
-* 🔍 Semantic search using embeddings
-* 🎯 Reranking using cross-encoder model for better relevance
-* 🤖 LLM-based answer generation (Groq / LLaMA models)
-* 📊 Observability with Langfuse (traces, prompts, responses)
-* 🌐 Streamlit-based interactive UI
-* ☁️ Production deployment on AWS EC2
-* 🔐 Nginx reverse proxy setup
-* ⚡ Fast inference pipeline
-
----
+- 📄 Multi-format document support (PDF, DOCX, TXT, CSV, MD)
+- 🔍 Hybrid retrieval — BM25 keyword search + semantic embedding search
+- 🎯 Reranking using a cross-encoder model (MiniLM) for better relevance
+- 🤖 LLM-based answer generation (Groq / LLaMA 3.1)
+- 📊 Observability with Langfuse (traces, prompts, responses, latency)
+- 🌐 Streamlit-based interactive UI
+- ⚡ Fast inference pipeline
 
 ## 🏗️ System Architecture
-
-User → Streamlit UI → Document Upload → Text Extraction → Chunking → Embeddings → Vector Search → Reranking → LLM (Groq) → Response
-
-With observability:
-All steps are logged and traced using Langfuse.
-
----
+```
+User → Streamlit UI → Document Upload → Text Extraction → Chunking → Embeddings → Hybrid Retrieval (BM25 + Semantic) → Reranking → LLM (Groq) → Response
+```
+Every step is logged and traced using Langfuse.
 
 ## 🧰 Tech Stack
+**Backend / AI**
+- Python, LangChain
+- SentenceTransformers (`BAAI/bge-small-en-v1.5`) for embeddings
+- Cross-encoder reranker (`ms-marco-MiniLM-L-6-v2`)
+- BM25 for keyword-based retrieval
+- Groq LLM (LLaMA 3.1)
 
-### Backend / AI
+**Vector Store**
+- ChromaDB (persistent, cosine similarity, HNSW index)
 
-* Python
-* LangChain / custom RAG pipeline
-* SentenceTransformers (embeddings)
-* Cross-encoder reranker (MiniLM)
-* Groq LLM (LLaMA 3.1)
+**Frontend**
+- Streamlit
 
-### Vector Store
+**Deployment**
+- Streamlit Community Cloud
+- *(Originally self-hosted on AWS EC2 with Nginx as reverse proxy; migrated to Streamlit Community Cloud for continuous, maintenance-free hosting.)*
 
-* FAISS / Chroma (depending on config)
-
-### Frontend
-
-* Streamlit
-
-### Deployment
-
-* AWS EC2 (Ubuntu)
-* Nginx (reverse proxy)
-* DuckDNS / custom domain
-
-### Observability
-
-* Langfuse
-* Logging (system logs / debug logs)
-
----
+**Observability**
+- Langfuse
 
 ## ⚙️ Installation
-
-### 1. Clone the repository
-
 ```bash
 git clone https://github.com/fatima-firdouse/Production-Grade-RAG-Pipeline-with-Observability
-cd DocMind
-```
-
-### 2. Create virtual environment
-
-```bash
+cd Production-Grade-RAG-Pipeline-with-Observability
 python3 -m venv venv
 source venv/bin/activate
-```
-
-### 3. Install dependencies
-
-```bash
 pip install -r requirements.txt
 ```
 
----
+For offline evaluation (Ragas-based), also install:
+```bash
+pip install -r requirements-dev.txt
+```
 
 ## 🔐 Environment Variables
-
 Create a `.env` file:
-
-```env
-# 🔑 LLM / Inference
+```
 GROQ_API_KEY=your_groq_key
 HUGGINGFACE_API_KEY=your_hf_key
-
-# 📊 Observability (Langfuse)
 LANGFUSE_PUBLIC_KEY=your_public_key
 LANGFUSE_SECRET_KEY=your_secret_key
 LANGFUSE_BASE_URL=https://cloud.langfuse.com
-
-# 🧠 Tracking / Debugging
 USER_AGENT=rag-observability-pipeline/1.0
 ```
 
----
-
-## ▶️ Run the Application
-
-### Local
-
+## ▶️ Run Locally
 ```bash
 streamlit run app.py
 ```
 
-### Production (EC2)
-
-```bash
-nohup streamlit run app.py --server.port 8501 &
-```
-
----
-
-## 🌐 Nginx Configuration
-
-Used as reverse proxy to expose Streamlit app:
-
-* Handles HTTP routing
-* Manages client size limits
-* Improves security layer
-
----
-
 ## 📊 Observability
-
-DocMind integrates Langfuse to track:
-
-* User queries
-* Retrieved documents
-* Prompt sent to LLM
-* Model responses
-* Latency and performance
-
-This helps in debugging and improving retrieval quality.
-
----
+DocMind integrates Langfuse to track user queries, retrieved documents, prompts sent to the LLM, responses, and per-call latency — useful for debugging and improving retrieval quality over time.
 
 ## ⚠️ Known Challenges & Fixes
-
-### 1. Large file upload issues
-
-* Problem: 413 Request Entity Too Large
-* Fix: Increased `client_max_body_size` in Nginx
-
-### 2. Slow retrieval
-
-* Fix: Added reranking layer
-
-### 3. Poor answer quality
-
-* Fix: Improved chunking strategy + reranker
-
----
+1. **Large file uploads** — Hit `413 Request Entity Too Large` during the original Nginx-based deployment; fixed via `client_max_body_size`.
+2. **Slow / imprecise retrieval** — Semantic search alone missed exact-keyword matches; added BM25 hybrid retrieval plus a cross-encoder reranking layer.
+3. **Poor answer quality on long documents** — Improved by tuning the chunking strategy.
 
 ## 📌 Future Improvements
+- Add caching layer (Redis)
+- Add authentication system
+- Support multi-user sessions
+- Add a live evaluation dashboard for RAG quality (building on the existing Ragas-based offline evaluation)
 
-* Add caching layer (Redis)
-* Add authentication system
-* Support multi-user sessions
-* Improve chunking with semantic splitting
-* Add evaluation dashboard for RAG quality
-
----
-
-## 🧠 What makes this project different
-
-Unlike basic RAG systems, DocMind includes:
-
-* Production deployment setup
-* Observability layer
-* Reranking for accuracy boost
-* Real-world file handling constraints
-* End-to-end pipeline monitoring
-
----
+## 🧠 What Makes This Project Different
+- Hybrid retrieval, not just vector search
+- Full observability layer (not just logs)
+- Offline evaluation with Ragas, tracked separately from the production dependency set
+- Real-world file handling constraints, solved and documented
 
 ## 👩‍💻 Author
-
-Built as part of an AI engineering learning journey focused on production-ready LLM systems.
+Fatima Firdouse — B.Tech Artificial Intelligence & Data Science
+📧 fatimafirdouse011@gmail.com
